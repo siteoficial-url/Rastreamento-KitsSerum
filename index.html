@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreamento - Kit Sérum Redutor Instantâneo (Fundo Lateral)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Estilos Gerais --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            /* Fundo degradê para as laterais vermelhas */
+            background: linear-gradient(to right, #C53A3B 0%, #C53A3B 5%, #f5f7fa 25%, #e0e6ed 75%, #C53A3B 95%, #C53A3B 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* --- Header e Formulário (Mantidos Vermelho e Dourado) --- */
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: #C53A3B;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .product-logo {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            color: #DAA520;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .tracking-form input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box; 
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        
+        .tracking-form input[type="text"]:focus {
+            border-color: #DAA520;
+            box-shadow: 0 0 8px rgba(218, 165, 32, 0.2);
+            outline: none;
+        }
+
+        .tracking-form button {
+            width: 100%;
+            background: linear-gradient(90deg, #C53A3B 0%, #DAA520 100%);
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(197, 58, 59, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tracking-form button:hover {
+            background: linear-gradient(90deg, #DAA520 0%, #C53A3B 100%);
+            box-shadow: 0 8px 20px rgba(218, 165, 32, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* --- Status Bar / Linha do Tempo (Mantidos) --- */
+        .tracking-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 40px 0;
+            position: relative;
+        }
+        .timeline-line {
+            position: absolute;
+            height: 5px;
+            background: #e0e0e0;
+            width: 100%;
+            top: 18px;
+            left: 0;
+            z-index: 1;
+        }
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 33%;
+            z-index: 2;
+            position: relative;
+        }
+        .step-dot {
+            width: 38px;
+            height: 38px;
+            background: #cccccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            transition: all 0.5s ease;
+            border: 2px solid transparent;
+        }
+        .timeline-step.active .step-dot {
+            background-color: #DAA520;
+            box-shadow: 0 0 0 6px rgba(218, 165, 32, 0.3);
+            border-color: #DAA520;
+        }
+        .timeline-step.active .step-label {
+            color: #C53A3B;
+            font-weight: 600;
+        }
+
+        /* --- Mensagem de Status (Mantidos) --- */
+        #tracking-status {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 10px;
+            background-color: #fffaf0;
+            text-align: center;
+            border: 2px solid #DAA520;
+            font-weight: 400;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .status-message strong {
+            color: #C53A3B;
+            font-weight: 700;
+        }
+
+        /* --- Estilos do Rodapé de Feedback (Mantidos) --- */
+        .feedback-section {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .feedback-section p {
+            font-size: 1.2em;
+            color: #444;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .feedback-options {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        .feedback-option {
+            background-color: #f7f7f7;
+            color: #888;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: not-allowed;
+            transition: all 0.3s;
+            pointer-events: none;
+            opacity: 0.5;
+            width: 30%;
+            text-align: center;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        .feedback-option.active-feedback {
+            cursor: pointer;
+            pointer-events: auto;
+            opacity: 1;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #DAA520;
+        }
+
+        /* --- Estilos do Formulário de Suporte (Mantidos) --- */
+        .help-section {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .help-section h3 {
+            color: #C53A3B;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .help-form {
+            display: grid;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .help-form label {
+            font-weight: 500;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .help-form input[type="text"],
+        .help-form input[type="email"],
+        .help-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        
+        .help-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .help-form button {
+            background: #DAA520;
+            color: #333;
+            font-weight: 700;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 10px rgba(218, 165, 32, 0.3);
+        }
+
+        .help-form button:hover {
+            background: #e9c46a;
+        }
+
+        #help-status {
+            margin-top: 15px;
+            font-weight: 600;
+            color: #333;
+            min-height: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="product-logo">Seu Rastreamento Exclusivo</div>
+    <h2>Sérum Redutor Instantâneo</h2>
+
+    <form class="tracking-form" onsubmit="return rastrearPedido(event)">
+        <input type="text" id="tracking-code" name="tracking-code" placeholder="Digite seu Código de Rastreamento (Ex: SR-TIME-A1)" required>
+        <button type="submit">🔍 RASTREAR PEDIDO</button>
+    </form>
+
+    <div class="tracking-timeline" id="timeline">
+        <div class="timeline-line"></div>
+        
+        <div class="timeline-step" id="step1">
+            <div class="step-dot">1</div>
+            <div class="step-label">Produto Recolhido</div>
+        </div>
+        
+        <div class="timeline-step" id="step2">
+            <div class="step-dot">2</div>
+            <div class="step-label">Em Trânsito</div>
+        </div>
+        
+        <div class="timeline-step" id="step3">
+            <div class="step-dot">3</div>
+            <div class="step-label">Entrega Concluída</div>
+        </div>
+    </div>
+
+    <div id="tracking-status">
+        <p class="status-message">Aguardando o código para exibir o status do seu Sérum.</p>
+    </div>
+    
+    <div class="feedback-section">
+        <p>😊 Sua entrega foi concluída! Como foi sua experiência?</p>
+        <div class="feedback-options" id="feedback-options">
+            <button type="button" class="feedback-option" data-rating="Excelente" disabled onclick="sendFeedback(this, 'Excelente')">
+                Excelente
+            </button>
+            <button type="button" class="feedback-option" data-rating="Boa" disabled onclick="sendFeedback(this, 'Boa')">
+                Boa
+            </button>
+            <button type="button" class="feedback-option" data-rating="Ruim" disabled onclick="sendFeedback(this, 'Ruim')">
+                Ruim
+            </button>
+        </div>
+        <p id="feedback-message" style="margin-top: 15px; color: #C53A3B; font-weight: 600; min-height: 20px;"></p>
+    </div>
+    
+    <div class="help-section">
+        <h3>Precisa de Ajuda? Envie uma Mensagem</h3>
+        <form class="help-form" onsubmit="return sendHelpRequest(event)">
+            <div>
+                <label for="help-name">Seu Nome:</label>
+                <input type="text" id="help-name" required>
+            </div>
+            <div>
+                <label for="help-email">Seu Email:</label>
+                <input type="email" id="help-email" required>
+            </div>
+            <div>
+                <label for="help-tracking-code">Código de Rastreio:</label>
+                <input type="text" id="help-tracking-code" required>
+            </div>
+            <div>
+                <label for="help-message">O que houve? (Detalhe seu problema):</label>
+                <textarea id="help-message" required></textarea>
+            </div>
+            <button type="submit">Enviar Pedido de Ajuda</button>
+        </form>
+        <div id="help-status"></div>
+        <p style="font-size: 0.9em; color: #777; margin-top: 15px;">
+            Aguarde **24 horas** úteis para o retorno da nossa equipe.
+        </p>
+    </div>
+    
+</div>
+
+<script>
+    /**
+     * Função principal para rastrear o pedido, com simulações de status.
+     */
+    function rastrearPedido(event) {
+        event.preventDefault();
+        const code = document.getElementById('tracking-code').value.trim().toUpperCase();
+        const statusDiv = document.getElementById('tracking-status');
+        const steps = [
+            document.getElementById('step1'), 
+            document.getElementById('step2'), 
+            document.getElementById('step3')
+        ];
+        const feedbackOptions = document.querySelectorAll('.feedback-option');
+        const feedbackMsg = document.getElementById('feedback-message');
+
+        // 1. Limpa classes e estados
+        steps.forEach(step => step.classList.remove('active'));
+        feedbackOptions.forEach(btn => {
+            btn.classList.remove('active-feedback', 'submitted');
+            btn.setAttribute('disabled', 'true');
+            btn.style.opacity = '0.5';
+        });
+        feedbackMsg.innerHTML = ''; // Limpa mensagem de feedback
+
+        // 2. Lógica de Simulação de Rastreamento
+
+        if (code === 'SR-GOLD-03') {
+            // Status de ENTREGA CONCLUÍDA (Completo)
+            steps[0].classList.add('active'); 
+            steps[1].classList.add('active'); 
+            steps[2].classList.add('active'); 
+            
+            statusDiv.innerHTML = `
+                <p class="status-message">
+                    ✅ O seu pedido <strong>SR-GOLD-03</strong> foi <strong>ENTREGUE</strong> com sucesso!
+                    <br>
+                    <strong>Data de Entrega:</strong> ${new Date().toLocaleDateString('pt-BR')}
+                    <br>
+                    Aproveite seu Sérum Redutor Instantâneo!
+                </p>
+            `;
+            
+            // Ativa as opções de feedback
+            feedbackOptions.forEach(btn => {
+                btn.removeAttribute('disabled');
+                btn.classList.add('active-feedback');
+                btn.style.opacity = '1';
+            });
+
+        } else if (code === 'SR-TIME-A1') {
+             // Status de EM TRÂNSITO (Meio)
+            steps[0].classList.add('active');
+            steps[1].classList.add('active');
+            
+            statusDiv.innerHTML = `
+                <p class="status-message">
+                    📦 O seu pedido <strong>SR-TIME-A1</strong> está <strong>Em Trânsito</strong>. 
+                    <br>
+                    A previsão de entrega é entre 3 a 7 dias úteis.
+                    <br>
+                    Acompanhe por aqui as atualizações!
+                </p>
+            `;
+            
+        } else if (code.startsWith('SR-')) {
+            // Status de PRODUTO RECOLHIDO (Simples)
+            steps[0].classList.add('active');
+            
+            statusDiv.innerHTML = `
+                <p class="status-message">
+                    🚚 O seu pedido <strong>${code}</strong> foi <strong>Recolhido e Preparado</strong> para envio. 
+                    <br>
+                    O rastreamento completo estará disponível em breve!
+                </p>
+            `;
+        } else {
+            // Status para códigos inválidos ou não cadastrados
+            statusDiv.innerHTML = `
+                <p class="status-message">
+                    ❌ Código <strong>${code}</strong> não encontrado ou inválido.
+                    <br>
+                    Verifique se o código foi digitado corretamente (Ex: SR-TIME-A1) e tente novamente.
+                </p>
+            `;
+        }
+
+        return false; // Previne o envio do formulário
+    }
+    
+    /**
+     * Função para simular o envio do feedback do cliente.
+     */
+    function sendFeedback(button, rating) {
+        const feedbackMsg = document.getElementById('feedback-message');
+        const feedbackOptions = document.querySelectorAll('.feedback-option');
+
+        // Desativa todos os botões e remove o estilo ativo, exceto o clicado
+        feedbackOptions.forEach(btn => {
+            btn.classList.remove('active-feedback');
+            btn.setAttribute('disabled', 'true');
+            btn.style.opacity = '0.5';
+        });
+
+        // Marca o feedback enviado
+        button.classList.add('submitted');
+        button.style.opacity = '1';
+        button.style.backgroundColor = '#DAA520';
+        button.style.color = '#fff';
+
+        feedbackMsg.innerHTML = `Obrigado! Seu feedback **"${rating}"** foi registrado com sucesso.`;
+    }
+    
+    /**
+     * Função para simular o envio do formulário de ajuda/suporte.
+     */
+    function sendHelpRequest(event) {
+        event.preventDefault();
+        
+        const helpStatus = document.getElementById('help-status');
+        const name = document.getElementById('help-name').value.trim();
+        
+        // Simulação de envio bem-sucedido
+        helpStatus.innerHTML = `
+            🚀 Olá, **${name}**! Seu pedido de ajuda foi enviado. 
+            Nossa equipe responderá em seu e-mail em até 24 horas úteis.
+        `;
+        
+        // Opcional: Limpar o formulário após o "envio"
+        document.querySelector('.help-form').reset();
+        
+        return false; // Previne o envio real do formulário
+    }
+
+</script>
+</body>
+</html>
